@@ -1,0 +1,27 @@
+# --- Python / Entornos Virtuales ---
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# --- Variables de Entorno (¡CRÍTICO NO SUBIR!) ---
+.env
+.env.local
+
+# --- Base de Datos / Docker ---
+postgres_data/
+docker-compose.override.yml
+
+# --- IDEs / Editores ---
+.vscode/
+.idea/
+*.swp
+
+# --- Sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Archivos de diseño o backups locales ---
+docs/
+!README_assets/ # Permite imágenes si son para el README
