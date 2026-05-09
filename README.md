@@ -3,12 +3,18 @@
 Sistema escalable de gestión logística desarrollado con arquitectura limpia (Clean Architecture) y principios SOLID.
 
 ## 🚀 Tech Stack
+* **Frontend:** React 18+, TypeScript, Vite, Tailwind CSS, Lucide React.
 * **Backend:** Python 3.10+, FastAPI, SQLModel (Pydantic + SQLAlchemy).
 * **Base de Datos:** PostgreSQL 15 ejecutándose en Docker.
 * **Entorno:** WSL2 (Ubuntu 22.04), VS Code.
+* **Comunicación:** REST API + WebSockets para actualizaciones en tiempo real.
 
 ## 🛠️ Arquitectura del Proyecto
 El proyecto sigue una estructura modular para facilitar el testing y la escalabilidad:
+
+* `backend/`: API robusta con FastAPI y persistencia en PostgreSQL.
+* `frontend/`: Interfaz de usuario moderna, reactiva y tipada con TypeScript.
+
 * `app/models.py`: Definición de tablas y relaciones de base de datos.
 * `app/api/v1/endpoints/`: Lógica de negocio dividida por recursos (Shipments, Companies, etc.).
 * `app/database.py`: Configuración del motor y sesiones de SQLModel.
