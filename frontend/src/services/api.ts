@@ -18,7 +18,7 @@ export interface WarehouseCreateInput {
 
 export const companyService = {
   getAll: async () => {
-    const res = await fetch(`${API_BASE_URL}/companies/`);
+    const res = await fetch(`${API_BASE_URL}/companies/`, { cache: 'no-store' });
     return res.json();
   },
   create: async (data: CompanyCreateInput) => {
@@ -33,7 +33,7 @@ export const companyService = {
 
 export const warehouseService = {
   getAll: async () => {
-    const res = await fetch(`${API_BASE_URL}/warehouses/`);
+    const res = await fetch(`${API_BASE_URL}/warehouses/`, { cache: 'no-store' });
     return res.json();
   },
   create: async (data: WarehouseCreateInput) => {
@@ -48,7 +48,7 @@ export const warehouseService = {
 
 export const shipmentService = {
   getAll: async () => {
-    const res = await fetch(`${API_BASE_URL}/shipments/`);
+    const res = await fetch(`${API_BASE_URL}/shipments/`, { cache: 'no-store' });
     return res.json();
   },
   create: async (data: ShipmentCreateInput) => {
