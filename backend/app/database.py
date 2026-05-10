@@ -1,21 +1,37 @@
-from sqlmodel import create_engine, Session, SQLModel
+# backend/app/database.py
+from sqlmodel import create_engine, Session, SQLModel, select
 import os
 from dotenv import load_dotenv
-from sqlmodel import create_engine, SQLModel
+from app.models import Company, Warehouse
 
-# Carga las variables del archivo .env
 load_dotenv()
 
-# Obtener la URL, si no la encuentra usa una por defecto
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://admin:password123@localhost:5432/admin")
+engine = create_engine(DATABASE_URL)
 
-engine = create_engine(DATABASE_URL, echo=True)
+def seed_data(session: Session):
+    statement = select(Company)
+    existing_company = session.exec(statement).first()
+    if not existing_company:
+        company = Company(company_name="Logística Express")
+        session.add(company)
+        session.commit()
+        session.refresh(company)
+        
+        w1 = Warehouse(warehouse_name="Almacén Central (CDMX)", company_id=company.company_id)
+        w2 = Warehouse(warehouse_name="Distribuidora Norte (MTY)", company_id=company.company_id)
+        session.add_all([w1, w2])
+        session.commit()
 
 def init_db():
-    # Crea las tablas si no existen basándose en los modelos de Python
+    # AÑADE ESTA LÍNEA PARA BORRAR LAS TABLAS VIEJAS
+    SQLModel.metadata.drop_all(engine) 
+    # Esto creará las tablas nuevas con la columna 'content'
     SQLModel.metadata.create_all(engine)
+    
+    with Session(engine) as session:
+        seed_data(session)
 
-def get_session():
-    # Inyección de dependencia para las rutas
+def get_db():
     with Session(engine) as session:
         yield session

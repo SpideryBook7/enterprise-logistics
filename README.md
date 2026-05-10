@@ -34,4 +34,16 @@ El proyecto sigue una estructura modular para facilitar el testing y la escalabi
 3. **Ejecutar API:**
     uvicorn app.main:app --reload
 
+**Backend Setup:**
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python3 -m uvicorn app.main:app --reload
+
+**Frontend Setup:**
+cd frontend
+npm install
+npm run dev
+
 **Accede a la documentación interactiva en: http://localhost:8000/docs**

@@ -1,103 +1,135 @@
-import { useEffect, useState } from 'react'
-import { Package, Truck, Warehouse, Building2, LayoutDashboard } from 'lucide-react'
-import { companyService } from './services/api'
+import { Package, Truck, Warehouse as WarehouseIcon, LayoutDashboard } from 'lucide-react';
+import { shipmentService, companyService, warehouseService } from './services/api';
+import type { ShipmentCreateInput, CompanyCreateInput, WarehouseCreateInput } from './services/api';
+import { ShipmentForm } from './components/ShipmentForm';
+import { DashboardStats } from './components/DashboardStats';
+import { ShipmentTable } from './components/ShipmentTable';
+import { CompanyForm } from './components/CompanyForm';
+import { WarehouseForm } from './components/WarehouseForm';
+import { useLogisticsData } from './hooks/useLogisticsData';
+import { useShipmentWebSocket } from './hooks/useShipmentWebSocket';
+import { useToast } from './hooks/useToast';
 
 function App() {
-  const [companies, setCompanies] = useState<any[]>([]);
+  const { companies, warehouses, shipments, setShipments, loading, refreshData } = useLogisticsData();
+  useShipmentWebSocket(setShipments);
+  const toast = useToast();
 
-  useEffect(() => {
-    companyService.getAll().then(setCompanies).catch(console.error);
-  }, []);
+  const handleSubmit = async (data: ShipmentCreateInput) => {
+    try {
+      await shipmentService.create(data);
+      toast.success("Envío creado con éxito");
+    } catch (error) {
+      console.error("Error al crear:", error);
+      toast.error("Error al registrar el envío.");
+    }
+  };
 
-  // 1. Agregas el estado para los envíos
-  const [shipments, setShipments] = useState<any[]>([]);
+  const handleUpdateStatus = async (id: number, currentStatus: string) => {
+    let nextStatus = '';
+    if (currentStatus === 'pending') nextStatus = 'in_transit';
+    else if (currentStatus === 'in_transit') nextStatus = 'delivered';
+    
+    if (nextStatus) {
+      try {
+        await shipmentService.updateStatus(id, nextStatus);
+        toast.info("Estado del envío actualizado");
+      } catch (error) {
+        console.error("Error al actualizar estado:", error);
+        toast.error("Error al actualizar el estado del envío.");
+      }
+    }
+  };
 
-  // 2. Colocas el useEffect de WebSockets
-  useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8000/ws/shipments');
+  const handleCreateCompany = async (data: CompanyCreateInput) => {
+    try {
+      await companyService.create(data);
+      toast.success("Empresa registrada correctamente");
+      await refreshData();
+    } catch (error) {
+      toast.error("Error al registrar la empresa");
+    }
+  };
 
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      // Actualiza la lista de envíos agregando el nuevo al inicio
-      setShipments((prev) => [data, ...prev]);
-    };
+  const handleCreateWarehouse = async (data: WarehouseCreateInput) => {
+    try {
+      await warehouseService.create(data);
+      toast.success("Almacén registrado correctamente");
+      await refreshData();
+    } catch (error) {
+      toast.error("Error al registrar el almacén");
+    }
+  };
 
-    return () => socket.close(); 
-  }, []);
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen bg-slate-50 font-sans text-slate-500 font-bold">Cargando plataforma...</div>;
+  }
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white p-6 hidden md:block">
-        <div className="flex items-center gap-2 mb-10">
-          <Truck className="text-blue-400" size={32} />
+    <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans">
+      
+      {/* Sidebar Navigation */}
+      <aside className="w-64 bg-slate-900 text-white p-6 hidden lg:block">
+        <div className="flex items-center gap-3 mb-10">
+          <div className="bg-blue-600 p-2 rounded-lg">
+            <Truck size={24} className="text-white" />
+          </div>
           <span className="text-xl font-bold tracking-tight">EnterpriseLog</span>
         </div>
-        <nav className="space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-blue-600 rounded-lg cursor-pointer">
-            <LayoutDashboard size={20} /> <span>Dashboard</span>
+        <nav className="space-y-2">
+          <div className="flex items-center gap-3 p-3 bg-blue-600/20 text-blue-400 rounded-lg cursor-pointer border border-blue-600/30">
+            <LayoutDashboard size={20} /> <span className="font-medium">Dashboard</span>
           </div>
-          <div className="flex items-center gap-3 p-3 text-slate-400 hover:text-white cursor-pointer transition">
-            <Package size={20} /> <span>Shipments</span>
+          <div className="flex items-center gap-3 p-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg cursor-pointer transition">
+            <Package size={20} /> <span>Envíos</span>
           </div>
-          <div className="flex items-center gap-3 p-3 text-slate-400 hover:text-white cursor-pointer transition">
-            <Warehouse size={20} /> <span>Warehouses</span>
+          <div className="flex items-center gap-3 p-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg cursor-pointer transition">
+            <WarehouseIcon size={20} /> <span>Almacenes</span>
           </div>
         </nav>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-8">
-        <header className="mb-10">
-          <h1 className="text-2xl font-bold">Resumen Logístico</h1>
-          <p className="text-slate-500">Bienvenido de nuevo, Cristian.</p>
+      {/* Main Content Area */}
+      <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+        <header className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800">Panel de Control</h1>
+            <p className="text-slate-500">Gestión logística en tiempo real.</p>
+          </div>
+          <div className="bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200 flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Live System</span>
+          </div>
         </header>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-2 bg-blue-100 rounded-lg text-blue-600"><Building2 size={24}/></div>
-              <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">+12%</span>
-            </div>
-            <h3 className="text-slate-500 text-sm font-medium">Empresas Activas</h3>
-            <p className="text-2xl font-bold">{companies.length}</p>
-          </div>
-          {/* Aquí podrías añadir más tarjetas para Envíos y Vehículos */}
+        {/* Stats Summary Component */}
+        <DashboardStats 
+          totalCompanies={companies.length} 
+          totalShipments={shipments.length} 
+        />
+
+        {/* Management Forms */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <CompanyForm onSubmit={handleCreateCompany} />
+          <WarehouseForm companies={companies} onSubmit={handleCreateWarehouse} />
         </div>
 
-        {/* Data Table */}
-        <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h2 className="font-bold">Empresas Registradas</h2>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
-              + Nueva Empresa
-            </button>
-          </div>
-          <table className="w-full text-left">
-            <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
-              <tr>
-                <th className="px-6 py-4">ID</th>
-                <th className="px-6 py-4">Nombre de Empresa</th>
-                <th className="px-6 py-4">Estado</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {companies.map(company => (
-                <tr key={company.company_id} className="hover:bg-slate-50 transition">
-                  <td className="px-6 py-4 font-mono text-sm">#{company.company_id}</td>
-                  <td className="px-6 py-4 font-medium">{company.company_name}</td>
-                  <td className="px-6 py-4">
-                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Activo</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+        {/* Shipment Form Component */}
+        <ShipmentForm 
+          companies={companies}
+          warehouses={warehouses}
+          onSubmit={handleSubmit}
+        />
+
+        {/* Dynamic Shipments Table Component */}
+        <ShipmentTable 
+          shipments={shipments}
+          companies={companies}
+          onUpdateStatus={handleUpdateStatus}
+        />
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

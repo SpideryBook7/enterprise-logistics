@@ -25,3 +25,7 @@ Thumbs.db
 # --- Archivos de diseño o backups locales ---
 docs/
 !README_assets/ # Permite imágenes si son para el README
+
+# Personal
+SKILL.md
+CONTEXT.md

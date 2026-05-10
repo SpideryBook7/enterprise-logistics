@@ -1,18 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
-from app.database import get_session
-from app.models import Company
-from typing import List
+from app.database import get_db
+from app.models import Company, CompanyCreate
 
 router = APIRouter()
 
-@router.post("/", response_model=Company)
-def create_company(company: Company, session: Session = Depends(get_session)):
-    session.add(company)
-    session.commit()
-    session.refresh(company)
-    return company
+@router.get("/")
+async def get_companies(db: Session = Depends(get_db)):
+    statement = select(Company)
+    results = db.exec(statement).all()
+    return results
 
-@router.get("/", response_model=List[Company])
-def list_companies(session: Session = Depends(get_session)):
-    return session.exec(select(Company)).all()
+@router.post("/")
+async def create_company(company_data: CompanyCreate, db: Session = Depends(get_db)):
+    db_company = Company.from_orm(company_data)
+    db.add(db_company)
+    db.commit()
+    db.refresh(db_company)
+    return db_company
