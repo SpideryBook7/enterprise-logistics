@@ -1,49 +1,53 @@
-# 📦 SaaS Enterprise Logistics System
+# 📦 Enterprise Logistics SaaS
 
-Sistema escalable de gestión logística desarrollado con arquitectura limpia (Clean Architecture) y principios SOLID.
+Sistema escalable de gestión logística con arquitectura limpia (Clean Architecture), principios SOLID y diseño adaptativo (Mobile-First / Minimalista).
+
+![Enterprise Logistics](https://img.shields.io/badge/Status-Production_Ready-success)
+![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
 
 ## 🚀 Tech Stack
-* **Frontend:** React 18+, TypeScript, Vite, Tailwind CSS, Lucide React.
+
+* **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, React Router (SPA).
 * **Backend:** Python 3.10+, FastAPI, SQLModel (Pydantic + SQLAlchemy).
-* **Base de Datos:** PostgreSQL 15 ejecutándose en Docker.
-* **Entorno:** WSL2 (Ubuntu 22.04), VS Code.
-* **Comunicación:** REST API + WebSockets para actualizaciones en tiempo real.
+* **Base de Datos:** PostgreSQL 15.
+* **Tiempo Real:** WebSockets integrados para actualizaciones en vivo (sin refrescar).
 
-## 🛠️ Arquitectura del Proyecto
-El proyecto sigue una estructura modular para facilitar el testing y la escalabilidad:
+## 🛠️ Funcionalidades Core
 
-* `backend/`: API robusta con FastAPI y persistencia en PostgreSQL.
-* `frontend/`: Interfaz de usuario moderna, reactiva y tipada con TypeScript.
+1. **Gestión de Envíos en Tiempo Real:** Crea y rastrea paquetes a lo largo de los diferentes almacenes.
+2. **WebSockets Nativos:** Cada actualización de estado ("Pendiente" -> "En Tránsito") se propaga mágicamente a todas las pantallas abiertas.
+3. **Control Total de Entidades:** Interfaces para crear y catalogar múltiples Empresas y Almacenes.
+4. **UX Premium:** 
+   - Notificaciones *Toast* elegantes (no bloqueantes).
+   - Animaciones y transiciones de carga (*Skeleton Loaders*).
+   - Búsqueda instantánea en memoria para tracking ID o contenido.
+   - 100% Responsive (Menú inferior en móviles).
 
-* `app/models.py`: Definición de tablas y relaciones de base de datos.
-* `app/api/v1/endpoints/`: Lógica de negocio dividida por recursos (Shipments, Companies, etc.).
-* `app/database.py`: Configuración del motor y sesiones de SQLModel.
+## 🚦 Guía de Despliegue (Docker)
 
-## 🚦 Guía de Inicio Rápido
+La plataforma está completamente contenerizada. El orquestador levantará el Backend, el Frontend y la Base de datos Postgres persistente de manera automática.
 
-1. **Levantar Base de Datos:**
-   ```bash
-   docker-compose up -d
+```bash
+# Construir y levantar todos los servicios en segundo plano
+docker compose up --build -d
+```
 
-2. **Configurar Backend:**
-    cd backend
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
+### Accesos:
+* **App (Frontend):** `http://localhost:5173`
+* **API y WebSockets:** `ws://localhost:8000/ws/shipments`
+* **Documentación Interactiva (Swagger UI):** `http://localhost:8000/docs`
 
-3. **Ejecutar API:**
-    uvicorn app.main:app --reload
+> **Nota sobre Persistencia:** Los datos se guardan en un volumen local manejado por Docker (`postgres_data`). Reiniciar o tumbar el contenedor **no** eliminará los datos (empresas, almacenes, o envíos creados).
 
-**Backend Setup:**
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python3 -m uvicorn app.main:app --reload
+## 🗄️ Estructura del Proyecto
 
-**Frontend Setup:**
-cd frontend
-npm install
-npm run dev
+* `backend/app/`: Contiene la lógica del servidor dividida en rutas (`api/v1/endpoints/`), modelos ORM y WebSockets.
+* `frontend/src/`:
+  * `/pages`: Layouts modulares mediante *React Router*.
+  * `/components`: Componentes desacoplados, incluyendo UI de Toasts, Formularios de Gestión y Tablas dinámicas.
+  * `/hooks`: Abstracción de lógica (Custom Hooks para Fetching e instanciación del WebSocket).
 
-**Accede a la documentación interactiva en: http://localhost:8000/docs**
+## 🤝 Prácticas Empleadas
+- **SOLID**: Separación drástica entre vista (UI) y origen de datos (Hooks).
+- **Early Returns / Fail Fast**: Manejo de errores estricto en APIs y validación con Pydantic.
+- **Atomic Design UI**: Componentes pequeños (Toasts, Skeletons) reutilizables a lo largo del orquestador.

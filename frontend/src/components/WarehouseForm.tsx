@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Warehouse as WarehouseIcon, PlusCircle } from 'lucide-react';
+import { Warehouse as WarehouseIcon, Plus } from 'lucide-react';
 import type { WarehouseCreateInput } from '../services/api';
 
 interface WarehouseFormProps {
@@ -24,46 +24,61 @@ export function WarehouseForm({ companies, onSubmit }: WarehouseFormProps) {
         warehouse_name: formData.warehouse_name,
         company_id: Number(formData.company_id)
       });
-      setFormData({ ...formData, warehouse_name: '' }); // Keep selected company
+      setFormData({ ...formData, warehouse_name: '' }); 
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-full">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><WarehouseIcon size={18} /></div>
-        <h3 className="font-bold text-slate-700">Nuevo Almacén</h3>
+    <div className="bg-white p-6 lg:p-8 rounded-2xl shadow-sm border border-slate-200/60 h-full flex flex-col">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2.5 bg-slate-100 text-slate-700 rounded-lg">
+          <WarehouseIcon size={20} />
+        </div>
+        <div>
+          <h3 className="font-semibold text-slate-800">Nuevo Almacén</h3>
+          <p className="text-xs text-slate-500">Añade un punto de distribución</p>
+        </div>
       </div>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input 
-          type="text" 
-          placeholder="Nombre o Ubicación" 
-          className="p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition w-full text-sm"
-          value={formData.warehouse_name}
-          onChange={(e) => setFormData({...formData, warehouse_name: e.target.value})}
-          required 
-          disabled={loading}
-        />
-        <select 
-          className="p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer text-sm"
-          value={formData.company_id}
-          onChange={(e) => setFormData({...formData, company_id: e.target.value})}
-          required
-          disabled={loading}
-        >
-          <option value="">Pertenece a la empresa...</option>
-          {companies.map(c => (
-            <option key={c.company_id} value={c.company_id}>{c.company_name}</option>
-          ))}
-        </select>
+      
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1 justify-between">
+        <div className="space-y-4">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-slate-700">Nombre o Ubicación</label>
+            <input 
+              type="text" 
+              placeholder="Ej. Almacén Central CDMX..." 
+              className="p-3 bg-transparent border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-slate-400 text-sm"
+              value={formData.warehouse_name}
+              onChange={(e) => setFormData({...formData, warehouse_name: e.target.value})}
+              required 
+              disabled={loading}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-slate-700">Asignar Empresa</label>
+            <select 
+              className="p-3 bg-transparent border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all cursor-pointer text-sm"
+              value={formData.company_id}
+              onChange={(e) => setFormData({...formData, company_id: e.target.value})}
+              required
+              disabled={loading}
+            >
+              <option value="">Seleccionar empresa...</option>
+              {companies.map(c => (
+                <option key={c.company_id} value={c.company_id}>{c.company_name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        
         <button 
           type="submit" 
           disabled={loading || !formData.warehouse_name.trim() || !formData.company_id}
-          className="w-full bg-emerald-600 text-white p-3 rounded-xl font-bold text-sm hover:bg-emerald-700 shadow-md shadow-emerald-200 transition disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full mt-4 bg-slate-900 text-white p-3 rounded-xl font-semibold text-sm hover:bg-slate-800 transition-all active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          <PlusCircle size={16} /> {loading ? 'Creando...' : 'Registrar Almacén'}
+          <Plus size={16} /> {loading ? 'Creando...' : 'Registrar Almacén'}
         </button>
       </form>
     </div>

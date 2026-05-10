@@ -6,12 +6,10 @@ export function DashboardPage() {
   const { companies, shipments } = useLogisticsData();
 
   return (
-    <div>
-      <header className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-800">Panel de Control</h1>
-          <p className="text-slate-500">Métricas y resumen global.</p>
-        </div>
+    <div className="max-w-7xl mx-auto">
+      <header className="mb-10">
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Dashboard General</h1>
+        <p className="text-slate-500 mt-2 text-sm">Visión global de las operaciones logísticas y estado de la red.</p>
       </header>
 
       <DashboardStats 

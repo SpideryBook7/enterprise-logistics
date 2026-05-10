@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, PlusCircle } from 'lucide-react';
+import { Building2, Plus } from 'lucide-react';
 import type { CompanyCreateInput } from '../services/api';
 
 interface CompanyFormProps {
@@ -24,27 +24,36 @@ export function CompanyForm({ onSubmit }: CompanyFormProps) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-full">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><Building2 size={18} /></div>
-        <h3 className="font-bold text-slate-700">Nueva Empresa</h3>
+    <div className="bg-white p-6 lg:p-8 rounded-2xl shadow-sm border border-slate-200/60 h-full flex flex-col">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2.5 bg-slate-100 text-slate-700 rounded-lg">
+          <Building2 size={20} />
+        </div>
+        <div>
+          <h3 className="font-semibold text-slate-800">Nueva Empresa</h3>
+          <p className="text-xs text-slate-500">Registra un nuevo partner comercial</p>
+        </div>
       </div>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input 
-          type="text" 
-          placeholder="Nombre de la empresa" 
-          className="p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition w-full text-sm"
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
-          required 
-          disabled={loading}
-        />
+      
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1 justify-between">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-semibold text-slate-700">Nombre de la empresa</label>
+          <input 
+            type="text" 
+            placeholder="Ej. Global Logistics..." 
+            className="p-3 bg-transparent border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-slate-400 text-sm"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            required 
+            disabled={loading}
+          />
+        </div>
         <button 
           type="submit" 
           disabled={loading || !companyName.trim()}
-          className="w-full bg-indigo-600 text-white p-3 rounded-xl font-bold text-sm hover:bg-indigo-700 shadow-md shadow-indigo-200 transition disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full mt-4 bg-slate-900 text-white p-3 rounded-xl font-semibold text-sm hover:bg-slate-800 transition-all active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          <PlusCircle size={16} /> {loading ? 'Creando...' : 'Registrar Empresa'}
+          <Plus size={16} /> {loading ? 'Creando...' : 'Registrar Empresa'}
         </button>
       </form>
     </div>

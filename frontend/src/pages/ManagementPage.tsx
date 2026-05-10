@@ -30,13 +30,13 @@ export function ManagementPage() {
   };
 
   return (
-    <div>
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800">Gestión de Entidades</h1>
-        <p className="text-slate-500">Añade y administra las empresas y almacenes de la red.</p>
+    <div className="max-w-7xl mx-auto">
+      <header className="mb-10">
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Gestión de Entidades</h1>
+        <p className="text-slate-500 mt-2 text-sm">Añade y administra las empresas y almacenes de la red.</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 items-stretch">
         <CompanyForm onSubmit={handleCreateCompany} />
         <WarehouseForm companies={companies} onSubmit={handleCreateWarehouse} />
       </div>

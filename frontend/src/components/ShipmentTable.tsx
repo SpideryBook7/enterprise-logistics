@@ -1,4 +1,5 @@
 import React from 'react';
+import { Package, MapPin, CheckCircle2, ArrowRightCircle, Clock } from 'lucide-react';
 
 interface ShipmentTableProps {
   shipments: any[];
@@ -16,80 +17,93 @@ export function ShipmentTable({ shipments, companies, onUpdateStatus }: Shipment
 
   const getStatusBadge = (status: string) => {
     switch(status) {
-      case 'pending': return 'bg-amber-100 text-amber-700';
-      case 'in_transit': return 'bg-blue-100 text-blue-700';
-      case 'delivered': return 'bg-emerald-100 text-emerald-700';
-      default: return 'bg-slate-100 text-slate-700';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch(status) {
-      case 'pending': return 'Pendiente';
-      case 'in_transit': return 'En Tránsito';
-      case 'delivered': return 'Entregado';
-      default: return status;
+      case 'pending': 
+        return { 
+          bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200/60', icon: <Clock size={14}/>, label: 'Pendiente' 
+        };
+      case 'in_transit': 
+        return { 
+          bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200/60', icon: <ArrowRightCircle size={14}/>, label: 'En Tránsito' 
+        };
+      case 'delivered': 
+        return { 
+          bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200/60', icon: <CheckCircle2 size={14}/>, label: 'Entregado' 
+        };
+      default: 
+        return { 
+          bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200/60', icon: <Package size={14}/>, label: status 
+        };
     }
   };
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-      <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-        <h2 className="font-bold text-slate-700">Monitoreo de Envíos Recientes</h2>
+    <section>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-xl font-bold text-slate-800">Monitoreo de Envíos</h2>
+        <span className="text-sm font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">{shipments.length} Registros</span>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="text-slate-400 text-xs uppercase tracking-widest border-b border-slate-100">
-              <th className="px-6 py-4 font-bold">Tracking ID</th>
-              <th className="px-6 py-4 font-bold">Carga</th>
-              <th className="px-6 py-4 font-bold">Estado</th>
-              <th className="px-6 py-4 font-bold">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50">
-            {shipments.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-6 py-10 text-center text-slate-400 italic">No hay envíos registrados.</td>
-              </tr>
-            ) : (
-              shipments.map(shipment => {
-                const nextStatus = getNextStatus(shipment.status);
-                return (
-                  <tr key={shipment.shipment_id} className="hover:bg-blue-50/30 transition group">
-                    <td className="px-6 py-4">
-                      <span className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">
-                        #{shipment.shipment_id?.toString().padStart(5, '0')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="font-bold text-slate-700">{shipment.content}</p>
-                      <p className="text-[10px] text-slate-400 uppercase tracking-tighter">
-                        {shipment.company_name || companies.find(c => c.company_id === shipment.company_id)?.company_name || 'Desconocida'}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${getStatusBadge(shipment.status)}`}>
-                        {getStatusLabel(shipment.status)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      {nextStatus && (
-                        <button 
-                          onClick={() => onUpdateStatus(shipment.shipment_id, shipment.status)}
-                          className="bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 text-xs font-bold py-1 px-3 rounded-lg transition"
-                        >
-                          Avanzar a {getStatusLabel(nextStatus)}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+
+      {shipments.length === 0 ? (
+        <div className="bg-white p-12 rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center text-center">
+          <div className="bg-slate-50 p-4 rounded-full text-slate-400 mb-4">
+            <Package size={32} />
+          </div>
+          <h3 className="font-semibold text-slate-700 mb-1">No hay envíos registrados</h3>
+          <p className="text-sm text-slate-500">Crea el primer envío en el formulario superior.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {shipments.map(shipment => {
+            const nextStatus = getNextStatus(shipment.status);
+            const badge = getStatusBadge(shipment.status);
+            const companyName = shipment.company_name || companies.find(c => c.company_id === shipment.company_id)?.company_name || 'Desconocida';
+            
+            return (
+              <div key={shipment.shipment_id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/60 hover:shadow-md transition-all flex flex-col h-full">
+                
+                {/* Header Card */}
+                <div className="flex justify-between items-start mb-4">
+                  <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide border ${badge.bg} ${badge.text} ${badge.border}`}>
+                    {badge.icon}
+                    <span className="uppercase">{badge.label}</span>
+                  </div>
+                  <span className="font-mono text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded-md font-semibold tracking-wider">
+                    #{shipment.shipment_id?.toString().padStart(5, '0')}
+                  </span>
+                </div>
+
+                {/* Content Area */}
+                <div className="flex-1 mb-6">
+                  <h3 className="text-lg font-bold text-slate-800 leading-tight mb-2">
+                    {shipment.content}
+                  </h3>
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <MapPin size={14} className="text-slate-400" />
+                    <span className="text-xs font-medium uppercase tracking-wider">{companyName}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="pt-4 border-t border-slate-100 mt-auto">
+                  {nextStatus ? (
+                    <button 
+                      onClick={() => onUpdateStatus(shipment.shipment_id, shipment.status)}
+                      className="w-full bg-slate-50 hover:bg-slate-900 hover:text-white text-slate-700 text-sm font-semibold py-2.5 px-4 rounded-xl transition-all active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 flex items-center justify-center gap-2"
+                    >
+                      Avanzar a {getStatusBadge(nextStatus).label} <ArrowRightCircle size={16} />
+                    </button>
+                  ) : (
+                    <div className="w-full bg-emerald-50/50 text-emerald-600 text-sm font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 border border-emerald-100">
+                      <CheckCircle2 size={16} /> Completado
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }

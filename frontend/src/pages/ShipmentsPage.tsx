@@ -7,7 +7,7 @@ import { ShipmentForm } from '../components/ShipmentForm';
 import { ShipmentTable } from '../components/ShipmentTable';
 
 export function ShipmentsPage() {
-  const { companies, warehouses, shipments, setShipments, refreshData } = useLogisticsData();
+  const { companies, warehouses, shipments, setShipments } = useLogisticsData();
   useShipmentWebSocket(setShipments);
   const toast = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,15 +46,15 @@ export function ShipmentsPage() {
   });
 
   return (
-    <div>
-      <header className="mb-8 flex justify-between items-center">
+    <div className="max-w-7xl mx-auto">
+      <header className="mb-10 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Envíos</h1>
-          <p className="text-slate-500">Gestión logística en tiempo real.</p>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Centro de Envíos</h1>
+          <p className="text-slate-500 mt-2 text-sm">Gestión logística y actualizaciones en vivo vía WebSockets.</p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200 flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Live System</span>
+        <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200/60 flex items-center gap-2">
+          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Live Sync</span>
         </div>
       </header>
 
@@ -64,11 +64,11 @@ export function ShipmentsPage() {
         onSubmit={handleSubmit}
       />
 
-      <div className="mb-4 mt-8 flex justify-end">
+      <div className="mb-8 flex justify-end">
         <input 
           type="text" 
-          placeholder="🔍 Buscar por Tracking ID o Contenido..."
-          className="w-full md:w-1/3 p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition text-sm shadow-sm"
+          placeholder="🔍 Buscar por Tracking ID o Carga..."
+          className="w-full md:w-1/3 p-3 bg-white border border-slate-200/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm shadow-sm placeholder:text-slate-400"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />

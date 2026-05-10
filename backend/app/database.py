@@ -24,9 +24,7 @@ def seed_data(session: Session):
         session.commit()
 
 def init_db():
-    # AÑADE ESTA LÍNEA PARA BORRAR LAS TABLAS VIEJAS
-    SQLModel.metadata.drop_all(engine) 
-    # Esto creará las tablas nuevas con la columna 'content'
+    # Solo crea las tablas si no existen
     SQLModel.metadata.create_all(engine)
     
     with Session(engine) as session:
